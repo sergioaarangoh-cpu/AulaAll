@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.awt.TextField?>
+<VBox alignment="CENTER" spacing="15.0" prefWidth="380.0" prefHeight="420.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.aulaall.controller.LoginController"
+      style="-fx-background-color: #f4f6f9; -fx-padding: 30;">
+
+    <Label text="AulaAll" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #172b4d;" />
+    <Label text="Inicio de Sesión" style="-fx-font-size: 14px; -fx-text-fill: #5e6c84;" />
+
+    <!-- Mensaje de error/alerta dinámico -->
+    <Label fx:id="lblMensaje" textFill="#de350b" wrapText="true" visible="false" />
+
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label text="Correo institucional:" style="-fx-font-weight: bold;" />
+        <TextField fx:id="txtCorreo" promptText="usuario@autonoma.edu.co" prefHeight="35.0" />
+    </VBox>
+
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label text="Contraseña:" style="-fx-font-weight: bold;" />
+        <PasswordField fx:id="txtPassword" promptText="••••••••" prefHeight="35.0" />
+    </VBox>
+
+    <Button text="Iniciar sesión" onAction="#handleLogin" prefHeight="38.0" maxWidth="Infinity"
+            style="-fx-background-color: #0052cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
+</VBox>
