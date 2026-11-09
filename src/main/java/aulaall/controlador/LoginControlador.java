@@ -2,51 +2,42 @@ package aulaall.controlador;
 
 import aulaall.modelo.dao.UsuarioDAO;   // AJUSTAR: nombre real del DAO de usuarios
 import aulaall.util.CifradoContrasenia;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import aulaall.vista.VentanaLogin;
+import aulaall.vista.VentanaPrincipal;
 
-import java.io.IOException;
+import javax.swing.SwingUtilities;
 
 public class LoginControlador {
 
-    @FXML private TextField txtCorreo;
-    @FXML private PasswordField txtPassword;
-    @FXML private Label lblMensaje;
-
+    private final VentanaLogin vista;
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();   // AJUSTAR
 
-    @FXML
-    private void handleLogin(ActionEvent event) {
-        String correo = txtCorreo.getText().trim();
-        String password = txtPassword.getText();
+    public LoginControlador(VentanaLogin vista) {
+        this.vista = vista;
+        this.vista.addLoginListener(e -> handleLogin());
+    }
+
+    private void handleLogin() {
+        String correo = vista.getCorreo().trim();
+        String password = vista.getPassword();
 
         // Criterio 1: campos vacíos
         if (correo.isEmpty() || password.isEmpty()) {
-            mostrarAlerta("Por favor, ingresa correo y contraseña.");
+            vista.mostrarMensaje("Por favor, ingresa correo y contraseña.");
             return;
         }
 
         // Criterio 2: formato de correo institucional
         if (!correo.contains("@") || !correo.endsWith(".edu.co")) {
-            mostrarAlerta("Ingresa un correo institucional válido (*.edu.co).");
+            vista.mostrarMensaje("Ingresa un correo institucional válido (*.edu.co).");
             return;
         }
 
         // Autenticación con BCrypt (SCRUM-56)
-        boolean loginValido = autenticar(correo, password);
-
-        if (loginValido) {
-            abrirVentanaPrincipal(event);
+        if (autenticar(correo, password)) {
+            abrirVentanaPrincipal();
         } else {
-            mostrarAlerta("Correo o contraseña incorrectos.");
+            vista.mostrarMensaje("Correo o contraseña incorrectos.");
         }
     }
 
@@ -59,21 +50,21 @@ public class LoginControlador {
         return CifradoContrasenia.verificar(password, hashGuardado);
     }
 
-    private void mostrarAlerta(String mensaje) {
-        lblMensaje.setText(mensaje);
-        lblMensaje.setVisible(true);
+    private void abrirVentanaPrincipal() {
+        try {
+            new VentanaPrincipal().setVisible(true);
+            vista.dispose();
+        } catch (Exception e) {
+            e.printStackTrace();
+            vista.mostrarMensaje("Error al cargar la pantalla principal.");
+        }
     }
 
-    private void abrirVentanaPrincipal(ActionEvent event) {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/aulaall/vista/home-view.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root, 800, 600));
-            stage.setTitle("AulaAll - Panel Principal");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            mostrarAlerta("Error al cargar la pantalla principal.");
-        }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            VentanaLogin ventana = new VentanaLogin();
+            new LoginControlador(ventana);
+            ventana.setVisible(true);
+        });
     }
 }
